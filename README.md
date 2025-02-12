@@ -66,20 +66,20 @@ Content of the index.html file:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API via Nginx</title>
+    <title>API desde Nginx</title>
 </head>
 <body>
-    <h1>Hello from Nginx</h1>
-    <p id="message">Loading message from the API...</p>
+    <h1>Hola desde Nginx</h1>
+    <p id="mensaje">Cargando mensaje desde la API...</p>
 <script> 
-    fetch("http://<public_api>/api/hello")  // Use the public IP of the public instance
+    fetch("http://52.53.126.198/api/usarios") 
     .then(response => response.json())
     .then(data => {
-        document.getElementById("message").innerText = data.message;
+        document.getElementById("mensaje").innerText = data.message;
     })
     .catch(error => console.error("Error:", error));
 </script>
@@ -109,37 +109,29 @@ Content of the main.py file:
 ```python
 from flask import Flask, jsonify
 from flask_cors import CORS
-import mysql.connector  # Or psycopg2 for PostgreSQL
+import mysql.connector
+import os
 
-app = Flask(__name__)
-CORS(app)  # Enables CORS to allow requests from the browser
+app = Flask(_name_)
+CORS(app)
 
-# Database configuration (adjust parameters)
-db_config = {
-    'host': <endpoint>,  # Private IP of the database
-    'user': 'username',
-    'password': 'password',
-    'database': 'database_name'
-}
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.env["DB_HOST"]",
+        user=os.env["DB_USER"],
+        password=os.env["DB_PASS"],
+        database=os.env["DB_NAME"]
+    )
 
-def get_data():
-    conn = mysql.connector.connect(**db_config)
+@app.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM your_table LIMIT 10;")
-    results = cursor.fetchall()
-    cursor.close()
+    cursor.execute("SELECT * FROM empleados  LIMIT 5;")
+    usuarios = cursor.fetchall()
     conn.close()
-    return results
 
-@app.route('/api/data', methods=['GET'])
-def fetch_table():
-    try:
-        data = get_data()
-        return jsonify({'data': data}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(host='0.0.0.0', port=8080)
 ```
 
